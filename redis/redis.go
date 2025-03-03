@@ -97,3 +97,7 @@ func EvalBool(ctx context.Context, script string, keys []string, args ...interfa
 	}
 	return
 }
+
+func Del(ctx context.Context, keys ...string) error {
+	return rdb.Del(ctx, keys...).Err()
+}
