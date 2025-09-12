@@ -1,4 +1,4 @@
-module github.com/dennesshen/photon-redis-starter
+module github.com/Phofuture/photon-redis-starter
 
 go 1.23.0
 
