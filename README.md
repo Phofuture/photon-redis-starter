@@ -156,5 +156,5 @@ redis:
 ## 依賴
 
 - [go-redis/redis](https://github.com/redis/go-redis) - Redis 客戶端
-- [photon-core-starter](https://github.com/dennesshen/photon-core-starter) - Photon 核心框架
+- [photon-core-starter](https://github.com/Phofuture/photon-core-starter) - Photon 核心框架
 

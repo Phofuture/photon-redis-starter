@@ -3,7 +3,7 @@ module github.com/Phofuture/photon-redis-starter
 go 1.23.0
 
 require (
-	github.com/dennesshen/photon-core-starter v1.0.3
+	github.com/Phofuture/photon-core-starter v0.0.0-20250916060707-12acf34d9318
 	github.com/redis/go-redis/v9 v9.6.1
 )
 
