@@ -11,9 +11,7 @@ import (
 
 // RedisClient 統一接口，支持所有 Redis 客戶端類型
 type RedisClient interface {
-	redis.Cmdable
-	Ping(ctx context.Context) *redis.StatusCmd
-	Close() error
+	redis.UniversalClient
 }
 
 type StartRedisAction func(ctx context.Context, redis RedisClient) (err error)
