@@ -101,3 +101,7 @@ func EvalBool(ctx context.Context, script string, keys []string, args ...interfa
 func Del(ctx context.Context, keys ...string) error {
 	return rdb.Del(ctx, keys...).Err()
 }
+
+func Expire(ctx context.Context, key string, expiration time.Duration) error {
+	return rdb.Expire(ctx, key, expiration).Err()
+}
