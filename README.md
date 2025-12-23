@@ -22,7 +22,7 @@ import _ "github.com/Phofuture/photon-redis-starter"
 
 ```yaml
 redis:
-  type: "standalone"  # 或 "cluster"
+  type: "standalone" # 或 "cluster"
   hosts:
     - "localhost:6379"
   password: ""
@@ -46,37 +46,45 @@ package main
 import (
     "context"
     "time"
-    
+
     "github.com/Phofuture/photon-redis-starter/redis"
 )
 
 func main() {
     ctx := context.Background()
-    
+
     // 基本操作
     err := redis.Set(ctx, "key", "value", time.Hour)
     if err != nil {
         // 處理錯誤
     }
-    
+
     // 泛型 Get 操作
     value, err := redis.Get[string](ctx, "key")
     if err != nil {
         // 處理錯誤
     }
-    
+
     // Hash 操作
     err = redis.HSet(ctx, "hash_key", map[string]interface{}{
         "field1": "value1",
         "field2": 123,
     })
-    
+
     // 泛型 HGet 操作
     field1, err := redis.HGet[string](ctx, "hash_key", "field1")
-    
+
     // List 操作
     count, err := redis.RPush(ctx, "list_key", "item1")
     items, err := redis.LRangeAll[string](ctx, "list_key")
+
+    // Pub/Sub 操作
+    err := redis.Publish(ctx, "channel_name", "message")
+
+    subChan := redis.Subscribe(ctx, "channel_name")
+    for msg := range ch{
+      fmt.Printf("%s\n", msg)
+    }
 }
 ```
 
@@ -134,6 +142,7 @@ result, err := client.Ping(context.Background()).Result()
 ## 配置範例
 
 ### Standalone 模式
+
 ```yaml
 redis:
   type: "standalone"
@@ -143,6 +152,7 @@ redis:
 ```
 
 ### Cluster 模式
+
 ```yaml
 redis:
   type: "cluster"
@@ -157,4 +167,3 @@ redis:
 
 - [go-redis/redis](https://github.com/redis/go-redis) - Redis 客戶端
 - [photon-core-starter](https://github.com/Phofuture/photon-core-starter) - Photon 核心框架
-

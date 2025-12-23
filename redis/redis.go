@@ -105,3 +105,19 @@ func Del(ctx context.Context, keys ...string) error {
 func Expire(ctx context.Context, key string, expiration time.Duration) error {
 	return rdb.Expire(ctx, key, expiration).Err()
 }
+
+func Publish(ctx context.Context, channel, message string) error {
+	return rdb.Publish(ctx, channel, message).Err()
+}
+
+func Subscribe(ctx context.Context, channels ...string) <-chan string {
+	sub := rdb.Subscribe(ctx, channels...)
+	ch := make(chan string)
+	go func() {
+		for msg := range sub.Channel() {
+			ch <- msg.Payload
+		}
+		close(ch)
+	}()
+	return ch
+}
