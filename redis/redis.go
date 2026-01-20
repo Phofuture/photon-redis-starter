@@ -121,3 +121,11 @@ func Subscribe(ctx context.Context, channels ...string) <-chan string {
 	}()
 	return ch
 }
+
+func DeleteCount(ctx context.Context, keys ...string) (int64, error) {
+	count, err := rdb.Del(ctx, keys...).Result()
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
