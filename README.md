@@ -82,8 +82,15 @@ func main() {
     err := redis.Publish(ctx, "channel_name", "message")
 
     subChan := redis.Subscribe(ctx, "channel_name")
-    for msg := range ch{
-      fmt.Printf("%s\n", msg)
+    for msg := range subChan {
+        fmt.Printf("%s\n", msg)
+    }
+
+    // Stream 操作（廣播：一生產者多消費者）
+    id, err := redis.XAdd[string](ctx, "mystream", "hello")
+    msgs, err := redis.XRead[string](ctx, "mystream", redis.StreamIDNewest, 0)
+    for _, m := range msgs {
+        fmt.Printf("id=%s data=%s\n", m.ID, m.Data)
     }
 }
 ```
@@ -109,6 +116,29 @@ func main() {
 - `RPop[T](ctx, key)` - 從右側彈出元素（泛型）
 - `LRange[T](ctx, key, start, stop)` - 獲取範圍內的元素（泛型）
 - `LRangeAll[T](ctx, key)` - 獲取所有元素（泛型）
+
+### Stream 操作
+
+支援 Redis Stream，適用於廣播情境（一生產者對應多消費者）。
+
+#### 泛型 API（使用 "data" 欄位存放 JSON）
+
+- `XAdd[T](ctx, stream, value)` - 新增訊息至 Stream
+- `XAddWithMaxLen[T](ctx, stream, value, maxLen)` - 新增訊息並限制 Stream 長度
+- `XRead[T](ctx, stream, startID, count)` - 非阻塞讀取（startID 可用 `StreamIDNewest` 或 `StreamIDStart`）
+- `XReadBlock[T](ctx, stream, startID, block, count)` - 阻塞讀取，最多等待 block 時間
+- `XRange[T](ctx, stream, start, stop, count)` - 依 ID 範圍查詢
+- `XLen(ctx, stream)` - 取得 Stream 長度
+- `XDel(ctx, stream, ids...)` - 刪除訊息
+
+#### 原生 API（自訂 field-value）
+
+- `XAddRaw(ctx, stream, values)` - 使用 map 或 []interface{} 自訂欄位
+- `XAddRawWithMaxLen(ctx, stream, values, maxLen)` - 同上並限制長度
+- `XReadRaw(ctx, stream, startID, count, block)` - 返回 go-redis 原生 `[]XStream`
+- `XRangeRaw(ctx, stream, start, stop, count)` - 返回 go-redis 原生 `[]XMessage`
+
+**注意**：standalone 與 cluster 皆支援單一 Stream 的 XADD、XREAD、XRANGE、XLEN、XDEL；cluster 模式下單一 key 的 Stream 操作會正確路由至對應 slot。
 
 ### 進階操作
 
