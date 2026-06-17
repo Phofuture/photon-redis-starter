@@ -129,3 +129,27 @@ func DeleteCount(ctx context.Context, keys ...string) (int64, error) {
 	}
 	return count, nil
 }
+
+func SetJSON[T any](ctx context.Context, key string, value T, expiration time.Duration) error {
+	data, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	if err := rdb.Set(ctx, key, data, expiration).Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetJSON[T any](ctx context.Context, key string) (T, error) {
+	var value T
+	if str, err := rdb.Get(ctx, key).Result(); err != nil {
+		return value, err
+	} else if err := json.Unmarshal([]byte(str), &value); err != nil {
+		return value, err
+	} else {
+		return value, nil
+	}
+}
