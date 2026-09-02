@@ -36,6 +36,22 @@ func HSet(ctx context.Context, key string, values map[string]interface{}) error 
 	return rdb.HSet(ctx, key, values).Err()
 }
 
+func HGetAll[T any](ctx context.Context, key string) (map[string]T, error) {
+	result := make(map[string]T)
+	data, err := rdb.HGetAll(ctx, key).Result()
+	if err != nil {
+		return result, err
+	}
+	for k, str := range data {
+		var value T
+		if err := json.Unmarshal([]byte(str), &value); err != nil {
+			return result, err
+		}
+		result[k] = value
+	}
+	return result, nil
+}
+
 func Exists(ctx context.Context, key string) bool {
 	result, err := rdb.Exists(ctx, key).Result()
 	if err != nil {
